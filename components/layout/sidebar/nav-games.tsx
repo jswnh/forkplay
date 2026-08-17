@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   IconDots,
   IconFolder,
@@ -38,18 +39,18 @@ export function NavGames({
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Games</SidebarGroupLabel>
+      <SidebarGroupLabel>Your Games</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton
               render={
-                <a href={item.url}>
+                <Link href={item.url}>
                   <item.icon />
                   <span>{item.name}</span>
-                </a>
+                </Link>
               }
-            ></SidebarMenuButton>
+            />
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
@@ -61,7 +62,7 @@ export function NavGames({
                     <span className="sr-only">More</span>
                   </SidebarMenuAction>
                 }
-              ></DropdownMenuTrigger>
+              />
               <DropdownMenuContent
                 className="w-24 rounded-lg"
                 side={isMobile ? "bottom" : "right"}

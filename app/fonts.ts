@@ -9,7 +9,7 @@ export const russoOne = Russo_One({
 });
 
 export const minecrafter = localFont({
-  src: "../public/fonts/Minecrafter.Reg.ttf",
+  src: "../public/fonts/Minecrafter.Alt.ttf",
   variable: "--font-brand",
   display: "swap",
 });

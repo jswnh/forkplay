@@ -2,21 +2,11 @@
 
 import * as React from "react";
 import {
-  IconCamera,
   IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
   IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
+  IconDevicesCog,
   IconSearch,
   IconSettings,
-  IconUsers,
 } from "@tabler/icons-react";
 
 import {
@@ -32,6 +22,10 @@ import { NavMain } from "./nav-main";
 import { NavGames } from "./nav-games";
 import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
+import Link from "next/link";
+import AppLogo from "@/components/app-logo";
+
+const APP_NAME: string = process.env.NEXT_PUBLIC_APP_NAME || "App";
 
 const data = {
   user: {
@@ -42,8 +36,13 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: IconChartBar,
+    },
+    {
+      title: "Games",
+      url: "/games",
+      icon: IconDevicesCog,
     },
   ],
   navSecondary: [
@@ -74,10 +73,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               render={
-                <a href="#">
-                  <IconInnerShadowTop className="size-5!" />
-                  <span className="text-base font-semibold">Acme Inc.</span>
-                </a>
+                <Link href="/">
+                  <AppLogo size={32} />
+                  <span className="text-base font-brand">{APP_NAME}</span>
+                </Link>
               }
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             ></SidebarMenuButton>
