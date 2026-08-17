@@ -1,6 +1,5 @@
-import NextAuth, { Account, User } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
+import type { Account, Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import { compare } from "bcryptjs";
 import { UserRepository } from "@/server/modules/user/user.repository";
 import { db } from "@/server/database/client";
@@ -48,27 +47,38 @@ export class AuthService {
 
     return true;
   };
-}
 
-const { handlers, auth, signIn, signOut } = NextAuth({
-  providers: [
-    Credentials({
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      authorize: (credentials) => AuthService.verifyCredentials(credentials),
-    }),
-    Google,
-  ],
-  callbacks: {
-    signIn: ({ user, account }) => AuthService.handleOAuthSignIn(user, account),
-  },
-});
-
-export class AuthController {
-  static handlers = handlers;
-  static getSession = () => auth();
-  static signIn = (...args: Parameters<typeof signIn>) => signIn(...args);
-  static signOut = (...args: Parameters<typeof signOut>) => signOut(...args);
+  static handleJwt = async ({
+    token,
+    user,
+    account,
+  }: {
+    token: JWT;
+    user?: User;
+    account?: Account | null;
+  }) => {
+    if (user) {
+      if (account?.provider === "google") {
+        const dbUser = await usersRepository.findByEmail(user.email!);
+        if (dbUser) {
+          token.id = dbUser.userId;
+        }
+      } else {
+        token.id = user.id;
+      }
+    }
+    return token;
+  };
+  static handleSession = ({
+    session,
+    token,
+  }: {
+    session: Session;
+    token: JWT;
+  }) => {
+    if (token.id && session.user) {
+      session.user.id = token.id as string;
+    }
+    return session;
+  };
 }

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 export function SignupForm({
   className,
@@ -82,7 +83,7 @@ export function SignupForm({
             Sign up with Google
           </Button>
           <FieldDescription className="px-6 text-center">
-            Already have an account? <a href="#">Sign in</a>
+            Already have an account? <Link href="/auth/sign-in">Sign in</Link>
           </FieldDescription>
         </Field>
       </FieldGroup>

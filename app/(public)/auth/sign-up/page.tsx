@@ -1,6 +1,9 @@
 import { SignupForm } from "@/components/forms/signup-form";
 import { GalleryVerticalEnd } from "lucide-react";
 import Image from "next/image";
+
+const APP_NAME: string = process.env.NEXT_PUBLIC_APP_NAME || "App";
+
 export default function SignupPage() {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
@@ -10,7 +13,7 @@ export default function SignupPage() {
             <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <GalleryVerticalEnd className="size-4" />
             </div>
-            Acme Inc.
+            {APP_NAME}
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
@@ -23,6 +26,7 @@ export default function SignupPage() {
         <Image
           src={"/images/cyberpunk-soldier-futuristic-battle.jpg"}
           alt="Image"
+          loading="eager"
           fill
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
