@@ -9,6 +9,8 @@ const authRoutes = new Hono<{ Variables: AppVariables }>()
   .basePath("/user")
   .post("/sign-up", controller.signUp)
   .get("/session", AuthGuard.canActivate, controller.session)
-  .get("/sign-out", AuthGuard.canActivate, controller.signOut);
+  .get("/sign-out", AuthGuard.canActivate, controller.signOut)
+  .post("/forgot-password", controller.forgotPassword)
+  .post("/reset-password", controller.resetPassword);
 
 export { authRoutes };

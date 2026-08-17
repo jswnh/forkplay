@@ -4,7 +4,7 @@ import type { AppContext, AppVariables } from "../../context";
 import { UserRepository } from "./user.repository";
 import { db } from "@/server/database/client";
 import { users } from "@/server/database/schemas/user";
-import { AuthController } from "@/lib/auth";
+import { AuthController, AuthService } from "@/lib/auth";
 
 const usersRepository = new UserRepository(db);
 
@@ -33,4 +33,22 @@ export class UserController {
     await AuthController.signOut({ redirect: false });
     return ctx.json({ success: true });
   }
+
+  forgotPassword = async (c: AppContext) => {
+    const body = await c.req.json();
+
+    await AuthService.requestPasswordReset(body.email);
+
+    return c.json({
+      message: "If that email is registered, a reset link has been sent.",
+    });
+  };
+
+  resetPassword = async (c: AppContext) => {
+    const body = await c.req.json();
+
+    await AuthService.resetPassword(body.token, body.password);
+
+    return c.json({ success: true });
+  };
 }

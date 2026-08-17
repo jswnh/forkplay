@@ -1,9 +1,12 @@
 import type { Account, Session, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
-import { compare } from "bcryptjs";
+import { compare, hash } from "bcryptjs";
 import { UserRepository } from "@/server/modules/user/user.repository";
 import { db } from "@/server/database/client";
 import { users } from "@/server/database/schemas/user";
+import { randomBytes } from "crypto";
+import { EmailService } from "../email/email.service";
+import { AppError } from "@/server/lib/app-error";
 
 const usersRepository = new UserRepository(db);
 
@@ -77,5 +80,36 @@ export class AuthService {
       session.user.id = token.id as string;
     }
     return session;
+  };
+
+  static requestPasswordReset = async (email: string) => {
+    const user = await usersRepository.findByEmail(email);
+
+    // Always behave the same whether or not the user exists —
+    // prevents leaking which emails are registered (user enumeration).
+    if (!user) return;
+
+    const token = randomBytes(32).toString("hex");
+    const expires = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
+
+    await usersRepository.setResetToken(user.userId, token, expires);
+
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+    await EmailService.sendPasswordReset(email, resetUrl);
+  };
+
+  static resetPassword = async (token: string, newPassword: string) => {
+    const user = await usersRepository.findByResetToken(token);
+
+    if (!user || !user.passwordResetExpires) {
+      throw new AppError("Invalid or expired reset token", 400);
+    }
+
+    if (user.passwordResetExpires < new Date()) {
+      throw new AppError("Reset token has expired", 400);
+    }
+
+    const passwordHash = await hash(newPassword, 10);
+    await usersRepository.resetPassword(user.userId, passwordHash);
   };
 }
