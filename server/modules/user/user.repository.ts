@@ -6,7 +6,18 @@ const { passwordHash, ...publicColumns } = getTableColumns(users);
 
 export class UserRepository {
   constructor(private db: DbClient) {}
+
   async findByEmail(email: string) {
+    const result = await this.db
+      .select(publicColumns)
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    return result[0] ?? null;
+  }
+
+  async findByEmailWithPassword(email: string) {
     const result = await this.db
       .select()
       .from(users)

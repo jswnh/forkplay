@@ -16,7 +16,7 @@ export class AuthService {
 
     if (!email || !password) return null;
 
-    const user = await usersRepository.findByEmail(email);
+    const user = await usersRepository.findByEmailWithPassword(email);
     if (!user || !user.passwordHash) return null;
 
     const isValid = await compare(password, user.passwordHash);
@@ -48,23 +48,20 @@ export class AuthService {
     return true;
   };
 
-  static handleJwt = async ({
-    token,
-    user,
-    account,
-  }: {
-    token: JWT;
-    user?: User;
-    account?: Account | null;
-  }) => {
+  static handleJwt = async ({ token, user }: { token: JWT; user?: User }) => {
     if (user) {
-      if (account?.provider === "google") {
-        const dbUser = await usersRepository.findByEmail(user.email!);
+      if (user.id) {
+        const dbUser = await usersRepository.findById(user.id);
         if (dbUser) {
           token.id = dbUser.userId;
         }
-      } else {
-        token.id = user.id;
+      }
+
+      if (!token.id && user.email) {
+        const dbUser = await usersRepository.findByEmail(user.email);
+        if (dbUser) {
+          token.id = dbUser.userId;
+        }
       }
     }
     return token;
