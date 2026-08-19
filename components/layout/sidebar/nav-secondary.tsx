@@ -20,24 +20,38 @@ export function NavSecondary({
     title: string;
     url: string;
     icon: Icon;
+    onClick?: () => void;
   }[];
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                render={
-                  <Link href={item.url}>
-                    <item.icon />
+          {items.map((item) => {
+            const IconComp = item.icon;
+            return (
+              <SidebarMenuItem key={item.title}>
+                {item.onClick ? (
+                  <SidebarMenuButton
+                    onClick={item.onClick}
+                    className="cursor-pointer"
+                  >
+                    <IconComp className="size-4" />
                     <span>{item.title}</span>
-                  </Link>
-                }
-              />
-            </SidebarMenuItem>
-          ))}
+                  </SidebarMenuButton>
+                ) : (
+                  <SidebarMenuButton
+                    render={
+                      <Link href={item.url}>
+                        <IconComp className="size-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    }
+                  />
+                )}
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

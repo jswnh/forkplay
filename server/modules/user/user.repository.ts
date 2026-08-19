@@ -6,6 +6,8 @@ const {
   passwordHash,
   passwordResetToken,
   passwordResetExpires,
+  verificationToken,
+  verificationExpires,
   ...publicColumns
 } = getTableColumns(users);
 
@@ -40,6 +42,74 @@ export class UserRepository {
       .limit(1);
 
     return result[0] ?? null;
+  }
+
+  async findByUsername(username: string) {
+    const result = await this.db
+      .select(publicColumns)
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
+
+    return result[0] ?? null;
+  }
+
+  async updateUsername(userId: string, username: string) {
+    const [updated] = await this.db
+      .update(users)
+      .set({ username, updatedAt: new Date() })
+      .where(eq(users.userId, userId))
+      .returning(publicColumns);
+
+    return updated ?? null;
+  }
+
+  async updateProfile(
+    userId: string,
+    data: {
+      displayName?: string;
+      bio?: string;
+      avatarUrl?: string;
+      bannerUrl?: string;
+    },
+  ) {
+    const [updated] = await this.db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.userId, userId))
+      .returning(publicColumns);
+
+    return updated ?? null;
+  }
+
+  async findByVerificationToken(token: string) {
+    const result = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.verificationToken, token))
+      .limit(1);
+    return result[0] ?? null;
+  }
+
+  async setVerificationToken(userId: string, token: string, expires: Date) {
+    await this.db
+      .update(users)
+      .set({ verificationToken: token, verificationExpires: expires })
+      .where(eq(users.userId, userId));
+  }
+
+  async verifyEmail(userId: string) {
+    const [updated] = await this.db
+      .update(users)
+      .set({
+        emailVerified: new Date(),
+        verificationToken: null,
+        verificationExpires: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.userId, userId))
+      .returning(publicColumns);
+    return updated ?? null;
   }
 
   async findByResetToken(token: string) {

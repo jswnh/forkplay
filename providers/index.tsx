@@ -5,18 +5,21 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
 
+import { ToastProvider } from "./toast-provider";
+
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="system"
-      enableSystem
+      defaultTheme="dark"
+      forcedTheme="dark"
       disableTransitionOnChange
     >
       <QueryClientProvider client={queryClient}>
-        <>
-          {children} <ReactQueryDevtools initialIsOpen={false} />
-        </>
+        <ToastProvider>
+          {children}
+          <ReactQueryDevtools initialIsOpen={false} />
+        </ToastProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

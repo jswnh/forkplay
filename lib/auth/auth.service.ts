@@ -25,6 +25,10 @@ export class AuthService {
     const isValid = await compare(password, user.passwordHash);
     if (!isValid) return null;
 
+    if (!user.emailVerified) {
+      throw new Error("EMAIL_NOT_VERIFIED");
+    }
+
     return { id: user.userId, email: user.email };
   };
 
@@ -44,8 +48,13 @@ export class AuthService {
     if (!existing) {
       await db.insert(users).values({
         email: user.email,
+        displayName: user.name || null,
+        avatarUrl: user.image || null,
         passwordHash: null,
+        emailVerified: new Date(),
       });
+    } else if (!existing.emailVerified) {
+      await usersRepository.verifyEmail(existing.userId);
     }
 
     return true;
@@ -69,6 +78,7 @@ export class AuthService {
     }
     return token;
   };
+
   static handleSession = ({
     session,
     token,
@@ -94,7 +104,8 @@ export class AuthService {
 
     await usersRepository.setResetToken(user.userId, token, expires);
 
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const resetUrl = `${baseUrl}/reset-password?token=${token}`;
     await EmailService.sendPasswordReset(email, resetUrl);
   };
 

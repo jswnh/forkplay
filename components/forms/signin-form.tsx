@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,23 +19,32 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { signInSchema, type SignInDto } from "@/lib/schemas/sign-in.schema";
+import { IconLoader2, IconAlertCircle, IconMailForward } from "@tabler/icons-react";
+import { useResendVerification } from "@/hooks/use-user";
+import { useToast } from "@/providers/toast-provider";
 
 export function SigninForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const router = useRouter();
+  const { showToast } = useToast();
+  const [unverifiedEmail, setUnverifiedEmail] = React.useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<SignInDto>({
     resolver: zodResolver(signInSchema),
   });
 
+  const resendMutation = useResendVerification();
+
   const signInMutation = useMutation({
     mutationFn: async ({ email, password }: SignInDto) => {
+      setUnverifiedEmail(null);
       const result = await signIn("credentials", {
         email,
         password,
@@ -42,19 +52,45 @@ export function SigninForm({
       });
 
       if (result?.error) {
+        if (result.error.includes("EMAIL_NOT_VERIFIED") || result.code === "EMAIL_NOT_VERIFIED") {
+          setUnverifiedEmail(email);
+          throw new Error("Email identity not verified yet. Please check your inbox.");
+        }
         throw new Error("Invalid email or password");
       }
 
       return result;
     },
     onSuccess: () => {
-      router.push("/");
+      router.push("/games");
       router.refresh();
     },
   });
 
   const onSubmit = (data: SignInDto) => {
     signInMutation.mutate(data);
+  };
+
+  const handleResend = () => {
+    const email = unverifiedEmail || getValues("email");
+    if (!email) return;
+
+    resendMutation.mutate(email, {
+      onSuccess: () => {
+        showToast({
+          title: "Verification Email Sent",
+          description: `A new authorization link was dispatched to ${email}.`,
+          type: "success",
+        });
+      },
+      onError: (err: any) => {
+        showToast({
+          title: "Failed to Send",
+          description: err.message || "Failed to dispatch verification email.",
+          type: "error",
+        });
+      },
+    });
   };
 
   return (
@@ -65,56 +101,120 @@ export function SigninForm({
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Sign in to your account</h1>
+          <h1 className="text-2xl font-bold font-brand tracking-tight">Sign in to ForkPlay</h1>
           <p className="text-sm text-balance text-muted-foreground">
-            Enter your email below to sign in to your account
+            Enter your operator credentials to access your game library
           </p>
         </div>
+
+        {/* Unverified Email Alert */}
+        {unverifiedEmail && (
+          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 space-y-3 animate-in fade-in duration-200">
+            <div className="flex items-start gap-2.5">
+              <IconAlertCircle className="size-5 text-amber-400 shrink-0 mt-0.5" />
+              <div className="text-xs space-y-1">
+                <div className="font-bold text-amber-300 font-mono uppercase">
+                  Email Verification Required
+                </div>
+                <p className="text-muted-foreground leading-relaxed">
+                  Your account requires email verification before signing in. Please check your inbox for the authorization link.
+                </p>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleResend}
+              disabled={resendMutation.isPending}
+              className="w-full border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-mono h-8"
+            >
+              {resendMutation.isPending ? (
+                <>
+                  <IconLoader2 className="size-3.5 animate-spin mr-1.5" />
+                  Sending Link...
+                </>
+              ) : (
+                <>
+                  <IconMailForward className="size-3.5 mr-1.5" />
+                  Resend Verification Email
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
             id="email"
             type="email"
-            placeholder="m@example.com"
+            placeholder="operator@forkplay.io"
+            className="bg-white/5 border-white/15"
             {...register("email")}
           />
           {errors.email && <FieldError>{errors.email.message}</FieldError>}
         </Field>
+
         <Field>
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Password</FieldLabel>
             <Link
               href="#"
-              className="ml-auto text-sm underline-offset-4 hover:underline"
+              className="ml-auto text-xs text-cyan-400 hover:underline"
             >
-              Forgot your password?
+              Forgot password?
             </Link>
           </div>
-          <Input id="password" type="password" {...register("password")} />
+          <Input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            className="bg-white/5 border-white/15"
+            {...register("password")}
+          />
           {errors.password && (
             <FieldError>{errors.password.message}</FieldError>
           )}
         </Field>
-        {signInMutation.isError && (
+
+        {signInMutation.isError && !unverifiedEmail && (
           <FieldError>{signInMutation.error.message}</FieldError>
         )}
+
         <Field>
-          <Button type="submit" disabled={signInMutation.isPending}>
-            {signInMutation.isPending ? "Signing in..." : "Sign in"}
+          <Button
+            type="submit"
+            disabled={signInMutation.isPending}
+            className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-medium shadow-[0_0_15px_rgba(6,182,212,0.25)] h-10 font-mono text-xs"
+          >
+            {signInMutation.isPending ? (
+              <>
+                <IconLoader2 className="size-4 animate-spin mr-2" />
+                Signing in...
+              </>
+            ) : (
+              "Sign in to Command Hub"
+            )}
           </Button>
         </Field>
+
         <FieldSeparator>Or continue with</FieldSeparator>
+
         <Field>
           <Button
             variant="outline"
             type="button"
-            onClick={() => signIn("google", { redirectTo: "/" })}
+            onClick={() => signIn("google", { redirectTo: "/games" })}
+            className="w-full border-white/15 hover:bg-white/5 h-10 text-xs font-mono"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="100"
-              height="100"
+              width="18"
+              height="18"
               viewBox="0 0 48 48"
+              className="mr-2"
             >
               <path
                 fill="#FFC107"
@@ -135,9 +235,10 @@ export function SigninForm({
             </svg>
             Sign in with Google
           </Button>
+
           <FieldDescription className="text-center">
             Don&apos;t have an account?{" "}
-            <Link href="/auth/sign-up" className="underline underline-offset-4">
+            <Link href="/auth/sign-up" className="underline underline-offset-4 text-cyan-400">
               Sign up
             </Link>
           </FieldDescription>

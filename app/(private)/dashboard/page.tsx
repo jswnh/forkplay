@@ -1,15 +1,5 @@
-import { SiteContent } from "@/components/layout/sidebar/site-content";
+import { GamesDashboard } from "@/components/games/games-dashboard";
 
-export default function Page() {
-  return (
-    <SiteContent
-      breadcrumbs={[
-        {
-          label: "Dashboard",
-          href: "/dashboard",
-        },
-      ]}
-      showThemeToggle={false}
-    ></SiteContent>
-  );
+export default function DashboardPage() {
+  return <GamesDashboard />;
 }

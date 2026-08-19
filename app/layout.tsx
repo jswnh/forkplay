@@ -14,12 +14,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={cn(
+        "dark",
         "h-full",
         "antialiased",
         "font-sans",
         russoOne.variable,
         minecrafter.variable,
       )}
+      style={{ colorScheme: "dark" }}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

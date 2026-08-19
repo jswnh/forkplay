@@ -1,4 +1,6 @@
 "use client";
+
+import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,61 +9,246 @@ import {
   FieldGroup,
   FieldLabel,
   FieldSeparator,
+  FieldError,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { client } from "@/lib/client";
+import {
+  IconLoader2,
+  IconMailCheck,
+  IconCheck,
+  IconArrowRight,
+  IconMailForward,
+} from "@tabler/icons-react";
+import { useResendVerification } from "@/hooks/use-user";
+import { useToast } from "@/providers/toast-provider";
+
+const signUpSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(6, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+type SignUpDto = z.infer<typeof signUpSchema>;
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
-      <FieldGroup>
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Create your account</h1>
-          <p className="text-sm text-balance text-muted-foreground">
-            Fill in the form below to create your account
+  const [registeredEmail, setRegisteredEmail] = React.useState<string | null>(
+    null,
+  );
+  const { showToast } = useToast();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpDto>({
+    resolver: zodResolver(signUpSchema),
+  });
+
+  const resendMutation = useResendVerification();
+
+  const signUpMutation = useMutation({
+    mutationFn: async ({ email, password }: SignUpDto) => {
+      const res = await (client.api.user["sign-up"].$post as any)({
+        json: { email, password },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to create account");
+      }
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      setRegisteredEmail(variables.email);
+      showToast({
+        title: "⚡ Verification Link Dispatched",
+        description: `Please check ${variables.email} to verify your account.`,
+        type: "success",
+      });
+    },
+  });
+
+  const onSubmit = (data: SignUpDto) => {
+    signUpMutation.mutate(data);
+  };
+
+  const handleResend = () => {
+    if (!registeredEmail) return;
+    resendMutation.mutate(registeredEmail, {
+      onSuccess: () => {
+        showToast({
+          title: "Link Resent",
+          description: `A new verification email has been dispatched to ${registeredEmail}.`,
+          type: "success",
+        });
+      },
+      onError: (err: any) => {
+        showToast({
+          title: "Resend Failed",
+          description: err.message,
+          type: "error",
+        });
+      },
+    });
+  };
+
+  // Success view: Check email inbox
+  if (registeredEmail) {
+    return (
+      <div className="flex flex-col items-center text-center space-y-6 animate-in zoom-in-95 duration-200">
+        <div className="size-16 rounded-2xl bg-cyan-500/15 border border-cyan-500/40 text-cyan-400 flex items-center justify-center shadow-[0_0_30px_rgba(6,182,212,0.3)]">
+          <IconMailCheck className="size-9" />
+        </div>
+
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold font-brand text-foreground">
+            Check Your Inbox
+          </h2>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+            We sent an identity authorization link to{" "}
+            <strong className="text-cyan-400 font-mono">{registeredEmail}</strong>.
+            Click the link in the email to activate your account and start gaming.
           </p>
         </div>
+
+        <div className="w-full space-y-3 pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleResend}
+            disabled={resendMutation.isPending}
+            className="w-full border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-xs font-mono h-10"
+          >
+            {resendMutation.isPending ? (
+              <>
+                <IconLoader2 className="size-3.5 animate-spin mr-1.5" />
+                Resending Link...
+              </>
+            ) : (
+              <>
+                <IconMailForward className="size-3.5 mr-1.5" />
+                Resend Verification Email
+              </>
+            )}
+          </Button>
+
+          <Link href="/auth/sign-in" className="block w-full">
+            <Button
+              variant="outline"
+              className="w-full border-white/10 hover:bg-white/5 text-xs font-mono h-10"
+            >
+              Proceed to Sign In
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      onSubmit={handleSubmit(onSubmit)}
+      {...props}
+    >
+      <FieldGroup>
+        <div className="flex flex-col items-center gap-1 text-center">
+          <h1 className="text-2xl font-bold font-brand tracking-tight">Create Operator Account</h1>
+          <p className="text-sm text-balance text-muted-foreground">
+            Join the decentralized next-gen game launcher network
+          </p>
+        </div>
+
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input id="email" type="email" placeholder="m@example.com" required />
-          <FieldDescription>
-            We&apos;ll use this to contact you. We will not share your email
-            with anyone else.
-          </FieldDescription>
+          <Input
+            id="email"
+            type="email"
+            placeholder="operator@forkplay.io"
+            className="bg-white/5 border-white/15"
+            {...register("email")}
+          />
+          {errors.email && <FieldError>{errors.email.message}</FieldError>}
         </Field>
+
         <Field>
           <FieldLabel htmlFor="password">Password</FieldLabel>
-          <Input id="password" type="password" required />
-          <FieldDescription>
-            Must be at least 8 characters long.
-          </FieldDescription>
+          <Input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            className="bg-white/5 border-white/15"
+            {...register("password")}
+          />
+          {errors.password && (
+            <FieldError>{errors.password.message}</FieldError>
+          )}
         </Field>
+
         <Field>
-          <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-          <Input id="confirm-password" type="password" required />
-          <FieldDescription>Please confirm your password.</FieldDescription>
+          <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
+          <Input
+            id="confirmPassword"
+            type="password"
+            placeholder="••••••••"
+            className="bg-white/5 border-white/15"
+            {...register("confirmPassword")}
+          />
+          {errors.confirmPassword && (
+            <FieldError>{errors.confirmPassword.message}</FieldError>
+          )}
         </Field>
+
+        {signUpMutation.isError && (
+          <FieldError>{signUpMutation.error.message}</FieldError>
+        )}
+
         <Field>
-          <Button type="submit">Create Account</Button>
+          <Button
+            type="submit"
+            disabled={signUpMutation.isPending}
+            className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-medium shadow-[0_0_15px_rgba(6,182,212,0.25)] h-10 font-mono text-xs"
+          >
+            {signUpMutation.isPending ? (
+              <>
+                <IconLoader2 className="size-4 animate-spin mr-2" />
+                Dispatching Verification Link...
+              </>
+            ) : (
+              "Create Account & Verify"
+            )}
+          </Button>
         </Field>
+
         <FieldSeparator>Or continue with</FieldSeparator>
+
         <Field>
           <Button
             variant="outline"
             type="button"
-            onClick={() => signIn("google", { redirectTo: "/" })}
+            onClick={() => signIn("google", { redirectTo: "/games" })}
+            className="w-full border-white/15 hover:bg-white/5 h-10 text-xs font-mono"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              x="0px"
-              y="0px"
-              width="100"
-              height="100"
+              width="18"
+              height="18"
               viewBox="0 0 48 48"
+              className="mr-2"
             >
               <path
                 fill="#FFC107"
@@ -82,8 +269,12 @@ export function SignupForm({
             </svg>
             Sign up with Google
           </Button>
-          <FieldDescription className="px-6 text-center">
-            Already have an account? <Link href="/auth/sign-in">Sign in</Link>
+
+          <FieldDescription className="text-center">
+            Already have an account?{" "}
+            <Link href="/auth/sign-in" className="underline underline-offset-4 text-cyan-400">
+              Sign in
+            </Link>
           </FieldDescription>
         </Field>
       </FieldGroup>
