@@ -530,11 +530,11 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-white/10 bg-black/40 py-10 mt-auto text-xs font-mono text-muted-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <AppLogo size={18} />
             <span className="font-bold text-foreground">ForkPlay Platform</span>
             <span>• Next-Gen Tactical Launcher</span>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-6">
             <Link href="/games" className="hover:text-cyan-400 transition-colors">

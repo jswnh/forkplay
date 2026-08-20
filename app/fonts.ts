@@ -8,8 +8,8 @@ export const russoOne = Russo_One({
   display: "swap",
 });
 
-export const minecrafter = localFont({
-  src: "../public/fonts/Minecrafter.Alt.ttf",
+export const audex = localFont({
+  src: "../public/fonts/Audex-Regular.ttf",
   variable: "--font-brand",
   display: "swap",
 });

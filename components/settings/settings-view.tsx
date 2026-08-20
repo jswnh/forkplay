@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useUserSession, useUpdateProfile, useChangePassword, useSetUsername } from "@/hooks/use-user";
 import { useUploadFile } from "@/hooks/use-upload";
 import { useToast } from "@/providers/toast-provider";
@@ -213,16 +214,21 @@ export function SettingsView() {
     <div className="flex flex-col min-h-full p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto w-full space-y-8 animate-in fade-in duration-300">
       {/* Header Bar */}
       <div className="border-b border-white/5 pb-6">
-        <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono mb-1">
-          <IconSettings className="size-4" />
-          <span>SYSTEM ARCHITECTURE // OPERATOR CONFIG</span>
+        <div className="flex items-start gap-3.5">
+          <SidebarTrigger className="mt-1 text-cyan-400 hover:text-cyan-300 hover:bg-white/10 size-9 rounded-xl border border-white/10 shrink-0" />
+          <div>
+            <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono mb-1">
+              <IconSettings className="size-4" />
+              <span>SYSTEM ARCHITECTURE // OPERATOR CONFIG</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight text-foreground">
+              Platform Settings & Preferences
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Configure visual shaders, operator security credentials, cloud save assets, and hardware acceleration.
+            </p>
+          </div>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight text-foreground">
-          Platform Settings & Preferences
-        </h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Configure visual shaders, operator security credentials, cloud save assets, and hardware acceleration.
-        </p>
       </div>
 
       {/* Tabs Bar */}

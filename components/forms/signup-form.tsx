@@ -28,6 +28,7 @@ import {
 } from "@tabler/icons-react";
 import { useResendVerification } from "@/hooks/use-user";
 import { useToast } from "@/providers/toast-provider";
+import { AppLogo } from "@/components/app-logo";
 
 const signUpSchema = z
   .object({
@@ -166,7 +167,12 @@ export function SignupForm({
       {...props}
     >
       <FieldGroup>
-        <div className="flex flex-col items-center gap-1 text-center">
+        <div className="flex flex-col items-center gap-1.5 text-center">
+          <Link href="/" className="mb-1 inline-flex items-center justify-center group" title="Return to ForkPlay Home">
+            <div className="size-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 p-1 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.4)] group-hover:scale-105 transition-transform">
+              <AppLogo size={28} />
+            </div>
+          </Link>
           <h1 className="text-2xl font-bold font-brand tracking-tight">Create Operator Account</h1>
           <p className="text-sm text-balance text-muted-foreground">
             Join the decentralized next-gen game launcher network

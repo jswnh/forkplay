@@ -19,6 +19,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useProfileData } from "@/hooks/use-profile";
 import { ProfileEditModal } from "@/components/modals/profile-edit-modal";
 import { GameLauncherModal, GameLauncherTarget } from "@/components/modals/game-launcher-modal";
@@ -52,6 +53,9 @@ export function ProfileView() {
     <div className="flex flex-col min-h-full p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8 animate-in fade-in duration-300">
       {/* Profile Header Banner */}
       <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-card shadow-2xl">
+        {/* Mobile / Desktop Sidebar Trigger */}
+        <SidebarTrigger className="absolute top-4 left-4 z-30 bg-black/60 backdrop-blur-md border border-white/15 text-cyan-400 hover:text-cyan-300 hover:bg-black/80 size-9 rounded-xl shadow-lg" />
+
         <div className="relative h-48 sm:h-64 w-full">
           <Image
             src={bannerUrl}

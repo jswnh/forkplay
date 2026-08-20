@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Dialog,
   DialogContent,
@@ -524,17 +525,20 @@ export function AdminView() {
     <div className="flex flex-col min-h-full p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8 animate-in fade-in duration-300">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
-        <div>
-          <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono mb-1">
-            <IconShield className="size-4 text-cyan-400" />
-            <span>PLATFORM OVERSEER // ROOT CLEARANCE ACTIVE</span>
+        <div className="flex items-start gap-3.5">
+          <SidebarTrigger className="mt-1 text-cyan-400 hover:text-cyan-300 hover:bg-white/10 size-9 rounded-xl border border-white/10 shrink-0" />
+          <div>
+            <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono mb-1">
+              <IconShield className="size-4 text-cyan-400" />
+              <span>PLATFORM OVERSEER // ROOT CLEARANCE ACTIVE</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight text-foreground">
+              Platform Management Center
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Oversee telemetry, games, store items & DLCs, accolades, and global operator comms.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight text-foreground">
-            Platform Management Center
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Oversee telemetry, games, store items & DLCs, accolades, and global operator comms.
-          </p>
         </div>
 
         {/* Action Buttons Bar */}

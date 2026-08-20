@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAchievementsList, useUnlockAchievement } from "@/hooks/use-achievements";
 import { useToast } from "@/providers/toast-provider";
 
@@ -91,19 +92,22 @@ export function AchievementsView() {
 
   return (
     <div className="flex flex-col min-h-full p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8 animate-in fade-in duration-300">
-      {/* Header Bar */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
-        <div>
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-mono mb-1">
-            <IconTrophy className="size-4" />
-            <span>TROPHY ROOM // OPERATOR HONORS</span>
+        <div className="flex items-start gap-3.5">
+          <SidebarTrigger className="mt-1 text-cyan-400 hover:text-cyan-300 hover:bg-white/10 size-9 rounded-xl border border-white/10 shrink-0" />
+          <div>
+            <div className="flex items-center gap-2 text-amber-400 text-xs font-mono mb-1">
+              <IconTrophy className="size-4" />
+              <span>TROPHY ROOM // OPERATOR HONORS</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight text-foreground">
+              Achievements & Medals
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Track tactical accolades, global completion milestones, and leaderboard XP.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight text-foreground">
-            Achievements & Medals
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Track tactical accolades, global completion milestones, and leaderboard XP.
-          </p>
         </div>
 
         {/* Global Stats Overview Strip */}

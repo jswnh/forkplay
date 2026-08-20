@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -183,20 +184,23 @@ export function InboxView() {
     <div className="flex flex-col h-[calc(100vh-var(--header-height)-1rem)] max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4 shrink-0">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight text-foreground">
-              Comms & Inbox
-            </h1>
-            {unreadCount > 0 && (
-              <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-cyan-500 text-black text-xs font-mono font-bold">
-                {unreadCount} unread
-              </span>
-            )}
+        <div className="flex items-start gap-3.5">
+          <SidebarTrigger className="mt-1 text-cyan-400 hover:text-cyan-300 hover:bg-white/10 size-9 rounded-xl border border-white/10 shrink-0" />
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight text-foreground">
+                Comms & Inbox
+              </h1>
+              {unreadCount > 0 && (
+                <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-cyan-500 text-black text-xs font-mono font-bold">
+                  {unreadCount} unread
+                </span>
+              )}
+            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 font-mono">
+              Encrypted transmission logs, achievements, and network broadcasts.
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 font-mono">
-            Encrypted transmission logs, achievements, and network broadcasts.
-          </p>
         </div>
 
         {/* Header Action Toolbar */}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/providers";
 import { cn } from "@/lib/utils";
-import { russoOne, minecrafter } from "./fonts";
+import { russoOne, audex } from "./fonts";
 
 export const metadata: Metadata = {
   title: "Forkplay",
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         "antialiased",
         "font-sans",
         russoOne.variable,
-        minecrafter.variable,
+        audex.variable,
       )}
       style={{ colorScheme: "dark" }}
       suppressHydrationWarning

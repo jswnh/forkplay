@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useStoreGames, useVerifyXendit } from "@/hooks/use-store";
 import { useStoreItems, useVerifyItemPayment } from "@/hooks/use-items";
 import { useToggleFavorite } from "@/hooks/use-games";
@@ -190,17 +191,20 @@ export function StoreView() {
     <div className="flex flex-col min-h-full p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8 animate-in fade-in duration-300">
       {/* Store Header & Category Switcher */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
-        <div>
-          <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono mb-1">
-            <IconBuildingStore className="size-4 text-cyan-400" />
-            <span>DIRECT NETWORK COMMERCE // CATALOGUE</span>
+        <div className="flex items-start gap-3.5">
+          <SidebarTrigger className="mt-1 text-cyan-400 hover:text-cyan-300 hover:bg-white/10 size-9 rounded-xl border border-white/10 shrink-0" />
+          <div>
+            <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono mb-1">
+              <IconBuildingStore className="size-4 text-cyan-400" />
+              <span>DIRECT NETWORK COMMERCE // CATALOGUE</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight text-foreground">
+              Digital Store & Vault
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Acquire tactical game licenses, expansion DLCs, cosmetics, and operator perks.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight text-foreground">
-            Digital Store & Vault
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Acquire tactical game licenses, expansion DLCs, cosmetics, and operator perks.
-          </p>
         </div>
 
         {/* Global Search & Tab Switcher */}

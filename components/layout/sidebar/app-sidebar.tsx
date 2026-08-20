@@ -72,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuItem>
               <SidebarMenuButton
                 render={
-                  <Link href="/games" className="flex items-center gap-2.5">
+                  <Link href="/" className="flex items-center gap-2.5">
                     <div className="size-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 p-0.5 flex items-center justify-center shadow-[0_0_12px_rgba(6,182,212,0.4)] shrink-0">
                       <AppLogo size={22} />
                     </div>
